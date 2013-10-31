@@ -2,7 +2,7 @@ module RobotApp
 
   extend self
 
-  def Run
+  def run
     console_write colorize('booting system from server SkyNet', 32)
 
     @terminator = Robot.new
@@ -20,11 +20,11 @@ module RobotApp
     if string.to_s.include? ','
       if @terminator.respond_to?(string.split(' ')[0].downcase) && string.split(' ')[1].split(',').length == 3
         arg = string.split(' ')[1].split(',')
-        @terminator.send(string.to_s.split(' ')[0].to_s, arg[0].to_i, arg[1].to_i, arg[2])
+        @terminator.send(string.downcase.split(' ')[0].to_s, arg[0].to_i, arg[1].to_i, arg[2])
       end
     else
-      if @terminator.respond_to?(string.downcase) && @terminator.direct
-        @terminator.send(string.to_s)
+      if @terminator.respond_to?(string.downcase) && @terminator.direct &&  @terminator.all_available_methods.include?(string.downcase)
+        @terminator.send(string.downcase)
       else
         @terminator.ignore
       end
@@ -70,11 +70,11 @@ class Robot
 
   DIRECTION = [{'NORTH' => [0,1]}, {'EAST' => [1,0]}, {'SOUTH' => [0,-1]}, {'WEST' => [-1,0]}]
 
-  def self.AllAvailableMethods
-    %W[move left right report place]
+  def all_available_methods
+    %W[move left right report]
   end
 
-  attr_accessor :direct, :position, :table
+  attr_accessor :direct
 
   def initialize(x = 5, y = 6)
     @table = [x,y]
@@ -141,4 +141,4 @@ class Robot
 
 end
 
-RobotApp.Run
+RobotApp.run
