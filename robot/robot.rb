@@ -4,9 +4,7 @@ module RobotApp
 
   def run
     console_write colorize('booting system from server SkyNet', 32)
-
     @terminator = Robot.new
-
     command = console_read
     until command.downcase == 'exit'
       try_parse command
@@ -16,19 +14,84 @@ module RobotApp
   end
 
   private
+
   def try_parse(string)
-    if string.to_s.include? ','
-      if @terminator.respond_to?(string.split(' ')[0].downcase) && string.split(' ')[1].split(',').length == 3
-        arg = string.split(' ')[1].split(',')
-        @terminator.send(string.downcase.split(' ')[0].to_s, arg[0].to_i, arg[1].to_i, arg[2])
+    if string.downcase.include? 'test'
+      new_string = /test \d*/.match(string.downcase).to_s
+      unless new_string.empty?
+        arg = new_string.split(' ')[1]
+        case arg.to_i.abs
+          when 1
+            test1
+          when 2
+            test2
+          when 3
+            test3
+          else
+            puts "List test:\ntest 1\ntest 2 \ntest 3"
+        end
+      else
+        puts "List test:\ntest 1\ntest 2 \ntest 3"
       end
     else
-      if @terminator.respond_to?(string.downcase) && @terminator.direct &&  @terminator.all_available_methods.include?(string.downcase)
-        @terminator.send(string.downcase)
+      if string.include? ','
+        new_string = /PLACE \d*,\d*,(WEST|NORTH|EAST|SOUTH)/.match(string.upcase).to_s
+        unless new_string.empty?
+          arg = new_string.split(' ')[1].split(',')
+          @terminator.place(arg[0].to_i.abs , arg[1].to_i.abs , arg[2].upcase)
+        else
+          @terminator.ignore
+        end
       else
-        @terminator.ignore
+        if @terminator.ready? &&  @terminator.all_available_methods.include?(string.downcase)
+          @terminator.send(string.downcase)
+        else
+          @terminator.ignore
+        end
       end
     end
+  end
+
+  def test1
+    console_write colorize('Run test 1:', 34)
+    console_write 'PLACE 0,0,NORTH'
+    @terminator.place(0,0,'NORTH')
+    console_write 'MOVE'
+    @terminator.move
+    console_write 'REPORT'
+    @terminator.report
+    puts colorize('Must be: ',34) + colorize('0,1,NORTH', 32)
+    console_write colorize('Test 1: ', 34) + colorize('DONE', 32)
+  end
+
+  def test2
+    console_write colorize('Run test 2:', 34)
+    console_write 'PLACE 0,0,NORTH'
+    @terminator.place(0,0,'NORTH')
+    console_write 'LEFT'
+    @terminator.left
+    console_write 'REPORT'
+    @terminator.report
+    puts colorize('Must be: ',34) + colorize('0,0,WEST', 32)
+    console_write colorize('Test 2: ', 34) + colorize('DONE', 32)
+  end
+
+  def test3
+    console_write colorize('Run test 3:', 34)
+    console_write 'PLACE 1,2,EAST'
+    @terminator.place(1,2,'EAST')
+    console_write 'MOVE'
+    @terminator.move
+    console_write 'MOVE'
+    @terminator.move
+    console_write 'LEFT'
+    @terminator.left
+    console_write 'MOVE'
+    @terminator.move
+    console_write 'REPORT'
+    @terminator.report
+    puts colorize('Must be: ',34) + colorize('3,3,NORTH', 32)
+    console_write colorize('Test 3: ', 34) + colorize('DONE', 32)
   end
 
   #Text style_code:
@@ -55,11 +118,11 @@ module RobotApp
   end
 
   def console_write(text)
-    puts colorize('ROBOT:~$ ', 1) + text
+    puts colorize('SkyNet:~$ ', 1) + text
   end
 
   def console_read
-    print colorize('ROBOT:~$ ', 1)
+    print colorize('SkyNet:~$ ', 1)
     gets.chomp
   end
 
@@ -73,8 +136,6 @@ class Robot
   def all_available_methods
     %W[move left right report]
   end
-
-  attr_accessor :direct
 
   def initialize(x = 5, y = 6)
     @table = [x,y]
@@ -110,6 +171,10 @@ class Robot
 
   def ignore
     puts 'Ignore you action ...'
+  end
+
+  def ready?
+    !!@direct
   end
 
   private
