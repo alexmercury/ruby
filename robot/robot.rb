@@ -1,16 +1,18 @@
+require '../console_color'
+
 module RobotApp
 
   extend self
 
   def run
-    console_write colorize('booting system from server SkyNet', 32)
+    console_write 'Booting system from server SkyNet'.green.bold
     @terminator = Robot.new
     command = console_read
     until command.downcase == 'exit'
       try_parse command
       command = console_read
     end
-    console_write colorize("I'll be back ...\n\tsystem shutdown ...", 31)
+    console_write "I'll be back ...".red.bold
   end
 
   private
@@ -27,11 +29,13 @@ module RobotApp
             test2
           when 3
             test3
+          when 4
+            test4
           else
-            puts "List test:\ntest 1\ntest 2 \ntest 3"
+            puts "List test:\ntest 1\ntest 2 \ntest 3".green.bold
         end
       else
-        puts "List test:\ntest 1\ntest 2 \ntest 3"
+        puts "List test:\ntest 1\ntest 2 \ntest 3".green.bold
       end
     else
       if string.include? ','
@@ -53,31 +57,31 @@ module RobotApp
   end
 
   def test1
-    console_write colorize('Run test 1:', 34)
+    console_write 'Run test 1:'.blue.bold
     console_write 'PLACE 0,0,NORTH'
     @terminator.place(0,0,'NORTH')
     console_write 'MOVE'
     @terminator.move
     console_write 'REPORT'
     @terminator.report
-    puts colorize('Must be: ',34) + colorize('0,1,NORTH', 32)
-    console_write colorize('Test 1: ', 34) + colorize('DONE', 32)
+    puts 'Must be: '.blue.bold + '0,1,NORTH'.green
+    console_write 'Test 1: '.blue.bold + 'DONE'.green
   end
 
   def test2
-    console_write colorize('Run test 2:', 34)
+    console_write 'Run test 2:'.blue.bold
     console_write 'PLACE 0,0,NORTH'
     @terminator.place(0,0,'NORTH')
     console_write 'LEFT'
     @terminator.left
     console_write 'REPORT'
     @terminator.report
-    puts colorize('Must be: ',34) + colorize('0,0,WEST', 32)
-    console_write colorize('Test 2: ', 34) + colorize('DONE', 32)
+    puts 'Must be: '.blue.bold + '0,0,WEST'.green
+    console_write 'Test 2: '.blue.bold + 'DONE'.green
   end
 
   def test3
-    console_write colorize('Run test 3:', 34)
+    console_write 'Run test 3:'.blue.bold
     console_write 'PLACE 1,2,EAST'
     @terminator.place(1,2,'EAST')
     console_write 'MOVE'
@@ -90,44 +94,40 @@ module RobotApp
     @terminator.move
     console_write 'REPORT'
     @terminator.report
-    puts colorize('Must be: ',34) + colorize('3,3,NORTH', 32)
-    console_write colorize('Test 3: ', 34) + colorize('DONE', 32)
+    puts 'Must be: '.blue.bold + '3,3,NORTH'.green
+    console_write 'Test 3: '.blue.bold + 'DONE'.green
   end
 
-  #Text style_code:
-  #Bold (1)
-  #Text color_code:
-  # Black (30)
-  # Red (31)
-  # Green (32)
-  # Yellow (33)
-  # Blue (34)
-  # Magenta (35)
-  # Cyan (36)
-  # White (37)
-  #Background color_code:
-  # Red (41)
-  # Green (42)
-  # Yellow (43)
-  # Blue (44)
-  # Magenta (45)
-  # Cyan (46)
-  # White (47)
-  def colorize(text, color_code)
-    "\e[#{color_code}m#{text}\e[0m"
+  def test4
+    console_write 'Run test 3:'.blue.bold
+    console_write 'Parse file: '+'test4.txt'.green.bold
+    read_from_file('test4.txt').each do |str|
+      console_write str.to_s
+      try_parse str.to_s
+    end
+    console_write 'Test 4: '.blue.bold + 'DONE'.green
   end
 
   def console_write(text)
-    puts colorize('SkyNet:~$ ', 1) + text
+    puts 'SkyNet:~$ '.bold + text
   end
 
   def console_read
-    print colorize('SkyNet:~$ ', 1)
+    print 'SkyNet:~$ '.bold
     gets.chomp
   end
 
-end
+  def read_from_file(full_path)
+    all_text = ''
+    File.open(full_path, 'r') do |f1|
+      while line = f1.gets
+        all_text += line
+      end
+    end
+    all_text.to_enum(:scan, /(PLACE \d*,\d*,(WEST|NORTH|EAST|SOUTH))|(MOVE)|(LEFT)|(RIGHT)|(REPORT)/).map{Regexp.last_match}
+  end
 
+end
 
 class Robot
 
@@ -143,7 +143,7 @@ class Robot
   end
 
   def move
-    new_position = get_direct_arr.zip(@position).map{|x, y| x + y}
+    new_position = @direct.first.last.zip(@position).map{|x, y| x + y}
     stay_on_place?(new_position) ?  @position = new_position : ignore
   end
 
@@ -162,7 +162,7 @@ class Robot
   end
 
   def place(x=0,y=0,f=0)
-    if try_get_direct(f) && stay_on_place?([x,y])
+    if stay_on_place?([x,y]) && try_get_direct(f)
       @position = [x,y]
     else
       ignore
@@ -175,6 +175,14 @@ class Robot
 
   def ready?
     !!@direct
+  end
+
+  def try_do_action(method_name)
+    if respond_to?(method_name) && ready?
+      send method_name.downcase
+    else
+      ignore
+    end
   end
 
   private
@@ -197,7 +205,7 @@ class Robot
   end
 
   def stay_on_place?(pos)
-    if pos.include?(-1) || pos[0] > @table[0] || pos[1] > @table[1]
+    if pos.include?(-1) || (pos[0] > @table[0]) || (pos[1] > @table[1])
       return false
     else
       return true

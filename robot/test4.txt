@@ -1,0 +1,12 @@
+Welcome to RegExr PLACE 4,4,WEST 0.3b, an intuitive too MOVE l for learning, wriLEFTting, and testing Regular Expressions. Key features include:
+ MOVE
+* real tLEFTime results: shows results aREPORTs you type
+* code hinting: roll over your expression to see info on specific elements
+* detailed results: roll ovREPORTer a matchLEFT to see details & view group info below
+* bREPORTuilt in reMOVEgex guide: douREPORTble click entries to insert them inREPORTto your expression
+* online & desktop: regexr.com or download the desktop version for Mac, Windows, or Linux
+* save your expressions: My Saved expressions are saved locally
+* seLEFTarch Community MOVEexpressions and add your ownMOVE
+* create Share Links to send your expressions to co-workerREPORTs or link to them on Twitter or your blog [ex. http://RegExr.com?2rjl6]
+PLACE 9,9,NORTH
+Built by gskinner.com wLEFTith Flex 3 [adobe.com/go/flex] andMOVE Spelling Plus LiREPORTbrary for text hMOVEighlighting [gskinner.com/products/spl].
