@@ -1,16 +1,17 @@
-def num(times)
+def numeric_range(count)
   text = '1'
   arr = []
-  times.to_i.times do
+  count.times do
     str = ''
     char = '0'
+    puts text
     text.each_char do |c|
       if c == char
         arr[0] += 1
       else
         str += arr.join('').to_s
         arr.clear
-        arr = [1,c]
+        arr = [1, c]
       end
       char = c
     end
@@ -21,4 +22,4 @@ def num(times)
   text
 end
 
-puts num(40).length
+puts numeric_range(3).length
