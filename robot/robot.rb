@@ -37,8 +37,7 @@ class Robot
   end
 
   def place(x=0,y=0,f=0)
-    @position = Point.new(x,y)
-    ignore unless (@table.includes_point?(@position) && try_get_direct(f))
+    (@table.includes_point?(Point.new(x,y)) && try_get_direct(f)) ? @position = Point.new(x,y) : ignore
   end
 
   def ignore
